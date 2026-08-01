@@ -81,7 +81,7 @@ Nothing survives a restart, and nothing is written to disk at any point.
 
 ## Install
 
-Download `frothedboard-0.2.0-win-x64-portable.zip` from [Releases][releases], unpack the folder
+Download `frothedboard-0.2.1-win-x64-portable.zip` from [Releases][releases], unpack the folder
 anywhere — a USB stick is fine — and run `frothedboard.exe`. There is no installer and no runtime
 to install. It lives in the tray; right-click for the boards, to pause it, or to start it with
 Windows.
