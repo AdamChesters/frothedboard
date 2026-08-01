@@ -35,9 +35,6 @@ histories: Ditto, CopyQ, ArsClip, Win+V. Every one of them binds a *separate* sh
 `Ctrl+Alt+Numpad5`, `Ctrl+Shift+C` then a digit. The one script that hooks `Ctrl+C` itself breaks
 plain `Ctrl+C` — you have to tap space afterwards to get an ordinary copy.
 
-PowerToys has carried a request for exactly this since 2020 ([#3768][pt1], [#18430][pt2]). It is
-still open.
-
 The idea here isn't eleven clipboards. It's that the chord is a *suffix on the real shortcut*, so
 the feature costs nothing when you aren't using it.
 
@@ -126,7 +123,6 @@ packs from NuGet.
 Defaults live in `FrothedConfig` — board count, the chord timeouts, how long to wait for a lazy app
 to read the clipboard before taking it back, and whether `Ctrl+X` takes the chord too. There is no
 config file, because there is no file: nothing is written anywhere.
-
 
 ## Licence
 
