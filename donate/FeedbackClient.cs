@@ -22,17 +22,18 @@ internal static class FeedbackClient
     internal static async Task SendAsync(string name, string email, string message, string version, string appId, HttpClient? client = null)
     {
         var payload = Payload(name, email, message, version, appId);
+        using var deadline = new CancellationTokenSource(TimeSpan.FromSeconds(15));
         using var request = new HttpRequestMessage(HttpMethod.Post, Endpoint) { Content = JsonContent.Create(payload) };
-        using var response = await (client ?? Client).SendAsync(request, HttpCompletionOption.ResponseHeadersRead);
+        using var response = await (client ?? Client).SendAsync(request, HttpCompletionOption.ResponseHeadersRead, deadline.Token);
         response.EnsureSuccessStatusCode();
         if ((int)response.StatusCode != SupportContent.Feedback.GetProperty("ack").GetProperty("httpStatus").GetInt32()) throw new HttpRequestException("Feedback delivery was not confirmed.");
         if (response.Content.Headers.ContentType?.MediaType != SupportContent.Feedback.GetProperty("ack").GetProperty("contentType").GetString()) throw new HttpRequestException("Invalid feedback acknowledgement.");
         int limit = SupportContent.Feedback.GetProperty("ack").GetProperty("maxBytes").GetInt32();
-        using var stream = await response.Content.ReadAsStreamAsync();
+        using var stream = await response.Content.ReadAsStreamAsync(deadline.Token);
         using var bytes = new MemoryStream();
         var buffer = new byte[limit + 1];
         int read;
-        while ((read = await stream.ReadAsync(buffer)) > 0) {
+        while ((read = await stream.ReadAsync(buffer.AsMemory(), deadline.Token)) > 0) {
             if (bytes.Length + read > limit) throw new HttpRequestException("Feedback acknowledgement too large.");
             bytes.Write(buffer, 0, read);
         }
