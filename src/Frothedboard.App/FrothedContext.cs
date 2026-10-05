@@ -19,6 +19,7 @@ internal sealed class FrothedContext : ApplicationContext
     private readonly System.Windows.Forms.Timer _timer;
 
     private bool _paused;
+    private SupportForm? _support;
 
     public FrothedContext()
     {
@@ -106,7 +107,13 @@ internal sealed class FrothedContext : ApplicationContext
     private void BuildMenu()
     {
         var menu = _tray.ContextMenuStrip!;
+        foreach (ToolStripItem item in menu.Items.Cast<ToolStripItem>().ToArray()) item.Dispose();
         menu.Items.Clear();
+        var supportFont = new Font(menu.Font, FontStyle.Bold);
+        var support = new ToolStripMenuItem("Feedback / Donate", null, (_, _) => ShowSupport()) { Font = supportFont };
+        support.Disposed += (_, _) => supportFont.Dispose();
+        menu.Items.Add(support);
+        menu.Items.Add(new ToolStripSeparator());
 
         for (int i = 0; i < _slots.Count; i++)
         {
@@ -134,6 +141,13 @@ internal sealed class FrothedContext : ApplicationContext
         menu.Items.Add(new ToolStripMenuItem("Clear all boards", null, (_, _) => _slots.ClearAll()));
         menu.Items.Add(new ToolStripSeparator());
         menu.Items.Add(new ToolStripMenuItem("Quit", null, (_, _) => ExitThread()));
+    }
+
+    private void ShowSupport()
+    {
+        if (_support is null || _support.IsDisposed) _support = new SupportForm();
+        _support.Show();
+        _support.Activate();
     }
 
     /// <summary>
@@ -168,6 +182,7 @@ internal sealed class FrothedContext : ApplicationContext
     {
         if (disposing)
         {
+            _support?.Dispose();
             _hook.Dispose();
             _timer.Dispose();
 

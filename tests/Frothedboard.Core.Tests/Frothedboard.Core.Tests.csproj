@@ -23,6 +23,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Include="../../src/Frothedboard.App/FeedbackClient.cs" Link="FeedbackClient.cs" />
     <ProjectReference Include="..\..\src\Frothedboard.Core\Frothedboard.Core.csproj" />
   </ItemGroup>
 
