@@ -28,6 +28,7 @@ public class FeedbackClientTests
     [InlineData(200, "{\"ok\":true}", true)]
     [InlineData(200, "{\"ok\":false}", false)]
     [InlineData(200, "{}", false)]
+    [InlineData(200, "{\"ok\":true,\"extra\":true}", false)]
     [InlineData(202, "{\"ok\":true}", false)]
     [InlineData(503, "{\"ok\":true}", false)]
     public async Task DeliveryRequiresHttpAndJsonSuccess(int status, string body, bool success)
@@ -35,6 +36,12 @@ public class FeedbackClientTests
         using var client = new HttpClient(new FakeHandler(status, body));
         if (success) await FeedbackClient.SendAsync("test", "test@example.invalid", "message", "0.2.2", "frothedboard", client);
         else await Assert.ThrowsAsync<HttpRequestException>(() => FeedbackClient.SendAsync("test", "test@example.invalid", "message", "0.2.2", "frothedboard", client));
+    }
+    [Fact]
+    public async Task OversizedAcknowledgementRejected()
+    {
+        using var client = new HttpClient(new FakeHandler(200, "{\"ok\":true}" + new string(' ', 1024)));
+        await Assert.ThrowsAsync<HttpRequestException>(() => FeedbackClient.SendAsync("test", "test@example.invalid", "message", "0.2.2", "frothedboard", client));
     }
     private sealed class FakeHandler(int status, string body) : HttpMessageHandler
     {
