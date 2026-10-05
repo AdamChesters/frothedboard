@@ -24,6 +24,7 @@ internal static class FeedbackClient
         var payload = Payload(name, email, message, version);
         using var response = await (client ?? Client).PostAsJsonAsync(Endpoint, payload);
         response.EnsureSuccessStatusCode();
+        if (response.StatusCode != System.Net.HttpStatusCode.OK) throw new HttpRequestException("Feedback delivery was not confirmed.");
         using var json = JsonDocument.Parse(await response.Content.ReadAsStringAsync());
         if (!json.RootElement.TryGetProperty("ok", out var ok) || ok.ValueKind != JsonValueKind.True)
             throw new HttpRequestException("Feedback delivery was not confirmed.");
