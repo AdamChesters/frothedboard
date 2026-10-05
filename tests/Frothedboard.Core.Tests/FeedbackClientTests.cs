@@ -28,6 +28,7 @@ public class FeedbackClientTests
     [InlineData(200, "{\"ok\":true}", true)]
     [InlineData(200, "{\"ok\":false}", false)]
     [InlineData(200, "{}", false)]
+    [InlineData(202, "{\"ok\":true}", false)]
     [InlineData(503, "{\"ok\":true}", false)]
     public async Task DeliveryRequiresHttpAndJsonSuccess(int status, string body, bool success)
     {
