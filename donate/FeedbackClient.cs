@@ -22,11 +22,22 @@ internal static class FeedbackClient
     internal static async Task SendAsync(string name, string email, string message, string version, string appId, HttpClient? client = null)
     {
         var payload = Payload(name, email, message, version, appId);
-        using var response = await (client ?? Client).PostAsJsonAsync(Endpoint, payload);
+        using var request = new HttpRequestMessage(HttpMethod.Post, Endpoint) { Content = JsonContent.Create(payload) };
+        using var response = await (client ?? Client).SendAsync(request, HttpCompletionOption.ResponseHeadersRead);
         response.EnsureSuccessStatusCode();
         if ((int)response.StatusCode != SupportContent.Feedback.GetProperty("ack").GetProperty("httpStatus").GetInt32()) throw new HttpRequestException("Feedback delivery was not confirmed.");
-        using var json = JsonDocument.Parse(await response.Content.ReadAsStringAsync());
-        if (!json.RootElement.TryGetProperty("ok", out var ok) || ok.ValueKind != JsonValueKind.True)
+        if (response.Content.Headers.ContentType?.MediaType != SupportContent.Feedback.GetProperty("ack").GetProperty("contentType").GetString()) throw new HttpRequestException("Invalid feedback acknowledgement.");
+        int limit = SupportContent.Feedback.GetProperty("ack").GetProperty("maxBytes").GetInt32();
+        using var stream = await response.Content.ReadAsStreamAsync();
+        using var bytes = new MemoryStream();
+        var buffer = new byte[limit + 1];
+        int read;
+        while ((read = await stream.ReadAsync(buffer)) > 0) {
+            if (bytes.Length + read > limit) throw new HttpRequestException("Feedback acknowledgement too large.");
+            bytes.Write(buffer, 0, read);
+        }
+        using var json = JsonDocument.Parse(bytes.ToArray());
+        if (json.RootElement.ValueKind != JsonValueKind.Object || json.RootElement.EnumerateObject().Count() != 1 || !json.RootElement.TryGetProperty("ok", out var ok) || ok.ValueKind != JsonValueKind.True)
             throw new HttpRequestException("Feedback delivery was not confirmed.");
     }
 }
