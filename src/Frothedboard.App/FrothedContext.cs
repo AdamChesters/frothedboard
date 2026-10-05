@@ -145,7 +145,8 @@ internal sealed class FrothedContext : ApplicationContext
 
     private void ShowSupport()
     {
-        if (_support is null || _support.IsDisposed) _support = new SupportForm();
+        try { if (_support is null || _support.IsDisposed) _support = new SupportForm(SupportAdapter.Identity()); }
+        catch { MessageBox.Show("Bundled support content could not be loaded. Please reinstall the application.", "frothedboard", MessageBoxButtons.OK, MessageBoxIcon.Error); return; }
         _support.Show();
         _support.Activate();
     }

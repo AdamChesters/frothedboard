@@ -10,7 +10,7 @@ public class FeedbackClientTests
     [Fact]
     public void PayloadHasOnlyContactMessageAndTrustedAppVersion()
     {
-        var json = JsonSerializer.SerializeToElement(FeedbackClient.Payload(" Test ", "test@example.invalid", " Message ", "0.2.2"));
+        var json = JsonSerializer.SerializeToElement(FeedbackClient.Payload(" Test ", "test@example.invalid", " Message ", "0.2.2", "frothedboard"));
         Assert.Equal(5, json.EnumerateObject().Count());
         Assert.Equal("frothedboard", json.GetProperty("app").GetString());
         Assert.Equal("0.2.2", json.GetProperty("version").GetString());
@@ -21,9 +21,9 @@ public class FeedbackClientTests
     [InlineData("", "test@example.invalid", "message")]
     [InlineData("test", "bad", "message")]
     [InlineData("test", "test@example.invalid", " ")]
-    public void InvalidFieldsRejected(string name, string email, string message) => Assert.Throws<ArgumentException>(() => FeedbackClient.Payload(name, email, message, "0.2.2"));
+    public void InvalidFieldsRejected(string name, string email, string message) => Assert.Throws<ArgumentException>(() => FeedbackClient.Payload(name, email, message, "0.2.2", "frothedboard"));
     [Fact]
-    public void OversizedMessageRejected() => Assert.Throws<ArgumentException>(() => FeedbackClient.Payload("test", "test@example.invalid", new string('a', 4001), "0.2.2"));
+    public void OversizedMessageRejected() => Assert.Throws<ArgumentException>(() => FeedbackClient.Payload("test", "test@example.invalid", new string('a', 4001), "0.2.2", "frothedboard"));
     [Theory]
     [InlineData(200, "{\"ok\":true}", true)]
     [InlineData(200, "{\"ok\":false}", false)]
@@ -33,8 +33,8 @@ public class FeedbackClientTests
     public async Task DeliveryRequiresHttpAndJsonSuccess(int status, string body, bool success)
     {
         using var client = new HttpClient(new FakeHandler(status, body));
-        if (success) await FeedbackClient.SendAsync("test", "test@example.invalid", "message", "0.2.2", client);
-        else await Assert.ThrowsAsync<HttpRequestException>(() => FeedbackClient.SendAsync("test", "test@example.invalid", "message", "0.2.2", client));
+        if (success) await FeedbackClient.SendAsync("test", "test@example.invalid", "message", "0.2.2", "frothedboard", client);
+        else await Assert.ThrowsAsync<HttpRequestException>(() => FeedbackClient.SendAsync("test", "test@example.invalid", "message", "0.2.2", "frothedboard", client));
     }
     private sealed class FakeHandler(int status, string body) : HttpMessageHandler
     {
