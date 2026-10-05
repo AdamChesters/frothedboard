@@ -23,7 +23,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Include="../../src/Frothedboard.App/FeedbackClient.cs" Link="FeedbackClient.cs" />
+    <Compile Include="../../donate/FeedbackClient.cs" Link="FeedbackClient.cs" />
+    <Compile Include="../../donate/SupportContent.cs" Link="SupportContent.cs" />
+    <EmbeddedResource Include="../../donate/content.json" LogicalName="adamch-support.content.json" />
     <ProjectReference Include="..\..\src\Frothedboard.Core\Frothedboard.Core.csproj" />
   </ItemGroup>
 

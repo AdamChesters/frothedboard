@@ -15,6 +15,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Include="../../donate/*.cs" />
+    <EmbeddedResource Include="../../donate/content.json" LogicalName="adamch-support.content.json" />
+    <EmbeddedResource Include="../../donate/manifest.json" LogicalName="adamch-support.manifest.json" />
+    <EmbeddedResource Include="../../donate/assets/*" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\Frothedboard.Core\Frothedboard.Core.csproj" />
     <!-- Same file the exe wears, embedded so the tray icon is sharp at every size Windows asks
          for rather than a scaled-down 32x32. -->

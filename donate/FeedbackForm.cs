@@ -2,17 +2,19 @@ namespace Frothedboard.App;
 
 internal sealed class FeedbackForm : Form
 {
-    private readonly TextBox _name = new() { MaxLength = 100, Dock = DockStyle.Fill };
-    private readonly TextBox _email = new() { MaxLength = 254, Dock = DockStyle.Fill };
-    private readonly TextBox _message = new() { MaxLength = 4000, Multiline = true, AcceptsReturn = true, ScrollBars = ScrollBars.Vertical, Dock = DockStyle.Fill };
-    private readonly Button _send = new() { Text = "Send feedback", AutoSize = true, MinimumSize = new Size(140, 44), Enabled = false };
+    private readonly TextBox _name = new() { MaxLength = SupportContent.Limit("name"), Dock = DockStyle.Fill };
+    private readonly TextBox _email = new() { MaxLength = SupportContent.Limit("email"), Dock = DockStyle.Fill };
+    private readonly TextBox _message = new() { MaxLength = SupportContent.Limit("message"), Multiline = true, AcceptsReturn = true, ScrollBars = ScrollBars.Vertical, Dock = DockStyle.Fill };
+    private readonly Button _send = new() { Text = SupportContent.FeedbackText("submit"), AutoSize = true, MinimumSize = new Size(140, 44), Enabled = false };
     private readonly Button _close = new() { Text = "Close", AutoSize = true, MinimumSize = new Size(90, 44) };
     private readonly Label _status = new() { AutoSize = true, Dock = DockStyle.Fill };
     private bool _sending;
+    private readonly SupportIdentity _identity;
 
-    public FeedbackForm()
+    public FeedbackForm(SupportIdentity identity)
     {
-        Text = "Feedback / feature request";
+        _identity = identity;
+        Text = SupportContent.FeedbackText("title");
         Font = new Font("Segoe UI", 10);
         ClientSize = new Size(540, 550);
         MinimumSize = new Size(440, 500);
@@ -22,11 +24,11 @@ internal sealed class FeedbackForm : Form
         layout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
         Controls.Add(layout);
         void Add(Control control, SizeType size = SizeType.AutoSize, float height = 0) { layout.RowStyles.Add(new RowStyle(size, height)); layout.Controls.Add(control, 0, layout.Controls.Count); }
-        Add(new Label { Text = "Have an idea or found a problem? Send it to the frothedboard team.", AutoSize = true, MaximumSize = new Size(470, 0), Margin = new Padding(0, 0, 0, 16) });
+        Add(new Label { Text = SupportContent.FeedbackText("intro").Replace("{appName}", identity.AppName), AutoSize = true, MaximumSize = new Size(470, 0), Margin = new Padding(0, 0, 0, 16) });
         Add(new Label { Text = "&Name", AutoSize = true }); Add(_name);
         Add(new Label { Text = "&Email", AutoSize = true, Margin = new Padding(0, 12, 0, 3) }); Add(_email);
         Add(new Label { Text = "&Message", AutoSize = true, Margin = new Padding(0, 12, 0, 3) }); Add(_message, SizeType.Percent, 100);
-        Add(new Label { Text = "Only these fields, the app name and app version are sent. No clipboard contents or logs are attached.", AutoSize = true, MaximumSize = new Size(470, 0), Margin = new Padding(0, 12, 0, 12) });
+        Add(new Label { Text = SupportContent.FeedbackText("privacy"), AutoSize = true, MaximumSize = new Size(470, 0), Margin = new Padding(0, 12, 0, 12) });
         Add(_status);
         var actions = new FlowLayoutPanel { AutoSize = true, Dock = DockStyle.Fill, FlowDirection = FlowDirection.RightToLeft, Margin = new Padding(0, 12, 0, 0) };
         actions.Controls.Add(_send); actions.Controls.Add(_close); Add(actions);
@@ -39,7 +41,7 @@ internal sealed class FeedbackForm : Form
     }
     private void ValidateFields()
     {
-        try { FeedbackClient.Payload(_name.Text, _email.Text, _message.Text, SupportForm.AppVersion); _send.Enabled = !_sending; }
+        try { FeedbackClient.Payload(_name.Text, _email.Text, _message.Text, _identity.AppVersion, _identity.AppId); _send.Enabled = !_sending; }
         catch (ArgumentException) { _send.Enabled = false; }
     }
     private async Task Send()
@@ -50,11 +52,11 @@ internal sealed class FeedbackForm : Form
         _status.Text = "Sending...";
         try
         {
-            await FeedbackClient.SendAsync(_name.Text, _email.Text, _message.Text, SupportForm.AppVersion);
+            await FeedbackClient.SendAsync(_name.Text, _email.Text, _message.Text, _identity.AppVersion, _identity.AppId);
             _message.Clear();
-            _status.Text = "Thanks! Your feedback has been sent.";
+            _status.Text = SupportContent.FeedbackText("success");
         }
-        catch { _status.Text = "Could not send feedback. Please try again, or use Discord."; }
+        catch { _status.Text = SupportContent.FeedbackText("failure"); }
         finally
         {
             _sending = false;
