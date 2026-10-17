@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.2.3
+
+- The tray entry and window are now called Feedback / Support.
+- Refreshed support window: "Check for updates" and "Feedback form" side by side, a row of Discord, Reddit, GitHub, LinkedIn and AdamCh.com buttons, then the Support section with GitHub Sponsors, Buy Me a Coffee and PayPal.
+- Bundled .NET runtime updated to 8.0.32 with the latest security fixes.
+
 ## 0.2.2
 
 - Bundle the standardized support component, copy and feedback contract under `/donate`.

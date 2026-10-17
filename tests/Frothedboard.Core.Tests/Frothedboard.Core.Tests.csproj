@@ -26,6 +26,8 @@
     <Compile Include="../../donate/FeedbackClient.cs" Link="FeedbackClient.cs" />
     <Compile Include="../../donate/SupportContent.cs" Link="SupportContent.cs" />
     <EmbeddedResource Include="../../donate/content.json" LogicalName="adamch-support.content.json" />
+    <EmbeddedResource Include="../../donate/manifest.json" LogicalName="adamch-support.manifest.json" />
+    <EmbeddedResource Include="../../donate/assets/*" LogicalName="adamch-support.assets.%(Filename)%(Extension)" />
     <ProjectReference Include="..\..\src\Frothedboard.Core\Frothedboard.Core.csproj" />
   </ItemGroup>
 

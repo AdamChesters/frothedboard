@@ -110,7 +110,7 @@ internal sealed class FrothedContext : ApplicationContext
         foreach (ToolStripItem item in menu.Items.Cast<ToolStripItem>().ToArray()) item.Dispose();
         menu.Items.Clear();
         var supportFont = new Font(menu.Font, FontStyle.Bold);
-        var support = new ToolStripMenuItem("Feedback / Donate", null, (_, _) => ShowSupport()) { Font = supportFont };
+        var support = new ToolStripMenuItem("Feedback / Support", null, (_, _) => ShowSupport()) { Font = supportFont };
         support.Disposed += (_, _) => supportFont.Dispose();
         menu.Items.Add(support);
         menu.Items.Add(new ToolStripSeparator());

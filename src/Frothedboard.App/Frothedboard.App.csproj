@@ -11,14 +11,17 @@
     <AssemblyName>frothedboard</AssemblyName>
     <RootNamespace>Frothedboard.App</RootNamespace>
     <ApplicationIcon>frothedboard.ico</ApplicationIcon>
-    <Version>0.2.2</Version>
+    <Version>0.2.3</Version>
+    <!-- Release builds ship no PDB, so no build-machine path ends up in the exe. -->
+    <DebugType Condition="'$(Configuration)' == 'Release'">none</DebugType>
   </PropertyGroup>
 
   <ItemGroup>
     <Compile Include="../../donate/*.cs" />
     <EmbeddedResource Include="../../donate/content.json" LogicalName="adamch-support.content.json" />
     <EmbeddedResource Include="../../donate/manifest.json" LogicalName="adamch-support.manifest.json" />
-    <EmbeddedResource Include="../../donate/assets/*" />
+    <!-- SupportContent.AssetResource: adamch-support.assets.<file>; social buttons use the PNG copies. -->
+    <EmbeddedResource Include="../../donate/assets/*" LogicalName="adamch-support.assets.%(Filename)%(Extension)" />
   </ItemGroup>
 
   <ItemGroup>
